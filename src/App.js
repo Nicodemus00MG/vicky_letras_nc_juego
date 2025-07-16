@@ -95,14 +95,24 @@ const App = () => {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [selectedLetters, setSelectedLetters] = useState([]);
   
-  // CORREGIDO: Agregadas todas las letras necesarias incluyendo V, L, Ó
+  // CORREGIDO: Todas las letras exactas necesarias para cada palabra
   const [wordAvailableLetters, setWordAvailableLetters] = useState([
-    { letter: 'N', id: 1 }, { letter: 'U', id: 2 }, { letter: 'B', id: 3 }, 
-    { letter: 'E', id: 4 }, { letter: 'C', id: 5 }, { letter: 'A', id: 6 }, 
-    { letter: 'S', id: 7 }, { letter: 'O', id: 8 }, { letter: 'R', id: 9 }, 
-    { letter: 'Z', id: 10 }, { letter: 'D', id: 11 }, { letter: 'I', id: 12 },
-    { letter: 'V', id: 13 }, { letter: 'L', id: 14 }, { letter: 'L', id: 15 }, 
-    { letter: 'Ó', id: 16 }, { letter: 'E', id: 17 }, { letter: 'A', id: 18 }
+    // Para NUBE: N, U, B, E
+    { letter: 'N', id: 1 }, { letter: 'U', id: 2 }, { letter: 'B', id: 3 }, { letter: 'E', id: 4 },
+    // Para NIDO: N, I, D, O  
+    { letter: 'N', id: 5 }, { letter: 'I', id: 6 }, { letter: 'D', id: 7 }, { letter: 'O', id: 8 },
+    // Para NARIZ: N, A, R, I, Z
+    { letter: 'N', id: 9 }, { letter: 'A', id: 10 }, { letter: 'R', id: 11 }, { letter: 'I', id: 12 }, { letter: 'Z', id: 13 },
+    // Para NIEVE: N, I, E, V, E
+    { letter: 'N', id: 14 }, { letter: 'I', id: 15 }, { letter: 'E', id: 16 }, { letter: 'V', id: 17 }, { letter: 'E', id: 18 },
+    // Para CASA: C, A, S, A
+    { letter: 'C', id: 19 }, { letter: 'A', id: 20 }, { letter: 'S', id: 21 }, { letter: 'A', id: 22 },
+    // Para CORAZÓN: C, O, R, A, Z, Ó, N
+    { letter: 'C', id: 23 }, { letter: 'O', id: 24 }, { letter: 'R', id: 25 }, { letter: 'A', id: 26 }, { letter: 'Z', id: 27 }, { letter: 'Ó', id: 28 }, { letter: 'N', id: 29 },
+    // Para CABALLO: C, A, B, A, L, L, O
+    { letter: 'C', id: 30 }, { letter: 'A', id: 31 }, { letter: 'B', id: 32 }, { letter: 'A', id: 33 }, { letter: 'L', id: 34 }, { letter: 'L', id: 35 }, { letter: 'O', id: 36 },
+    // Para CORONA: C, O, R, O, N, A (2 O normales, NO Ó)
+    { letter: 'C', id: 37 }, { letter: 'O', id: 38 }, { letter: 'R', id: 39 }, { letter: 'O', id: 40 }, { letter: 'N', id: 41 }, { letter: 'A', id: 42 }
   ]);
 
   const allWords = [...palabrasN, ...palabrasC];
@@ -110,15 +120,22 @@ const App = () => {
 
   const resetLetterPool = () => {
     setWordAvailableLetters([
-      { letter: 'N', id: Math.random() }, { letter: 'U', id: Math.random() }, 
-      { letter: 'B', id: Math.random() }, { letter: 'E', id: Math.random() }, 
-      { letter: 'C', id: Math.random() }, { letter: 'A', id: Math.random() }, 
-      { letter: 'S', id: Math.random() }, { letter: 'O', id: Math.random() },
-      { letter: 'R', id: Math.random() }, { letter: 'Z', id: Math.random() },
-      { letter: 'D', id: Math.random() }, { letter: 'I', id: Math.random() },
-      { letter: 'V', id: Math.random() }, { letter: 'L', id: Math.random() },
-      { letter: 'L', id: Math.random() }, { letter: 'Ó', id: Math.random() },
-      { letter: 'E', id: Math.random() }, { letter: 'A', id: Math.random() }
+      // Para NUBE: N, U, B, E
+      { letter: 'N', id: Math.random() }, { letter: 'U', id: Math.random() }, { letter: 'B', id: Math.random() }, { letter: 'E', id: Math.random() },
+      // Para NIDO: N, I, D, O  
+      { letter: 'N', id: Math.random() }, { letter: 'I', id: Math.random() }, { letter: 'D', id: Math.random() }, { letter: 'O', id: Math.random() },
+      // Para NARIZ: N, A, R, I, Z
+      { letter: 'N', id: Math.random() }, { letter: 'A', id: Math.random() }, { letter: 'R', id: Math.random() }, { letter: 'I', id: Math.random() }, { letter: 'Z', id: Math.random() },
+      // Para NIEVE: N, I, E, V, E
+      { letter: 'N', id: Math.random() }, { letter: 'I', id: Math.random() }, { letter: 'E', id: Math.random() }, { letter: 'V', id: Math.random() }, { letter: 'E', id: Math.random() },
+      // Para CASA: C, A, S, A
+      { letter: 'C', id: Math.random() }, { letter: 'A', id: Math.random() }, { letter: 'S', id: Math.random() }, { letter: 'A', id: Math.random() },
+      // Para CORAZÓN: C, O, R, A, Z, Ó, N
+      { letter: 'C', id: Math.random() }, { letter: 'O', id: Math.random() }, { letter: 'R', id: Math.random() }, { letter: 'A', id: Math.random() }, { letter: 'Z', id: Math.random() }, { letter: 'Ó', id: Math.random() }, { letter: 'N', id: Math.random() },
+      // Para CABALLO: C, A, B, A, L, L, O
+      { letter: 'C', id: Math.random() }, { letter: 'A', id: Math.random() }, { letter: 'B', id: Math.random() }, { letter: 'A', id: Math.random() }, { letter: 'L', id: Math.random() }, { letter: 'L', id: Math.random() }, { letter: 'O', id: Math.random() },
+      // Para CORONA: C, O, R, O, N, A (2 O normales, NO Ó)
+      { letter: 'C', id: Math.random() }, { letter: 'O', id: Math.random() }, { letter: 'R', id: Math.random() }, { letter: 'O', id: Math.random() }, { letter: 'N', id: Math.random() }, { letter: 'A', id: Math.random() }
     ]);
   };
 
@@ -151,7 +168,24 @@ const App = () => {
   const resetActivity3 = () => {
     setSelectedLetters([]);
     setCurrentWordIndex(0);
-    resetLetterPool();
+    setWordAvailableLetters([
+      // Para NUBE: N, U, B, E
+      { letter: 'N', id: 1 }, { letter: 'U', id: 2 }, { letter: 'B', id: 3 }, { letter: 'E', id: 4 },
+      // Para NIDO: N, I, D, O  
+      { letter: 'N', id: 5 }, { letter: 'I', id: 6 }, { letter: 'D', id: 7 }, { letter: 'O', id: 8 },
+      // Para NARIZ: N, A, R, I, Z
+      { letter: 'N', id: 9 }, { letter: 'A', id: 10 }, { letter: 'R', id: 11 }, { letter: 'I', id: 12 }, { letter: 'Z', id: 13 },
+      // Para NIEVE: N, I, E, V, E
+      { letter: 'N', id: 14 }, { letter: 'I', id: 15 }, { letter: 'E', id: 16 }, { letter: 'V', id: 17 }, { letter: 'E', id: 18 },
+      // Para CASA: C, A, S, A
+      { letter: 'C', id: 19 }, { letter: 'A', id: 20 }, { letter: 'S', id: 21 }, { letter: 'A', id: 22 },
+      // Para CORAZÓN: C, O, R, A, Z, Ó, N
+      { letter: 'C', id: 23 }, { letter: 'O', id: 24 }, { letter: 'R', id: 25 }, { letter: 'A', id: 26 }, { letter: 'Z', id: 27 }, { letter: 'Ó', id: 28 }, { letter: 'N', id: 29 },
+      // Para CABALLO: C, A, B, A, L, L, O
+      { letter: 'C', id: 30 }, { letter: 'A', id: 31 }, { letter: 'B', id: 32 }, { letter: 'A', id: 33 }, { letter: 'L', id: 34 }, { letter: 'L', id: 35 }, { letter: 'O', id: 36 },
+      // Para CORONA: C, O, R, O, N, A (2 O normales, NO Ó)
+      { letter: 'C', id: 37 }, { letter: 'O', id: 38 }, { letter: 'R', id: 39 }, { letter: 'O', id: 40 }, { letter: 'N', id: 41 }, { letter: 'A', id: 42 }
+    ]);
   };
 
   // ========== ACTIVIDAD 4: Encuentra la letra ==========
