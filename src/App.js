@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Star, Heart, Sparkles, RotateCcw, Trophy, Smile } from 'lucide-react';
 
 const App = () => {
@@ -7,7 +7,7 @@ const App = () => {
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationMessage, setCelebrationMessage] = useState('¡Muy bien! ⭐');
 
-  // Datos para las actividades
+  // Datos para las actividades - movidos fuera para evitar dependencias
   const palabrasN = [
     { palabra: 'NUBE', imagen: '☁️', color: '#87CEEB' },
     { palabra: 'NIDO', imagen: '🪺', color: '#8B4513' },
@@ -22,12 +22,12 @@ const App = () => {
     { palabra: 'CORONA', imagen: '👑', color: '#FFD700' }
   ];
 
-  const celebrate = (message = '¡Muy bien! ⭐') => {
-    setScore(score + 1);
+  const celebrate = useCallback((message = '¡Muy bien! ⭐') => {
+    setScore(prev => prev + 1);
     setCelebrationMessage(message);
     setShowCelebration(true);
     setTimeout(() => setShowCelebration(false), 1500);
-  };
+  }, []);
 
   // ========== ACTIVIDAD 1: Clasificación de letras ==========
   const [availableLetters, setAvailableLetters] = useState([
@@ -40,7 +40,7 @@ const App = () => {
   const [draggedItem, setDraggedItem] = useState(null);
   const [dragOverTarget, setDragOverTarget] = useState(null);
 
-  const resetActivity1 = () => {
+  const resetActivity1 = useCallback(() => {
     setAvailableLetters([
       { letter: 'N', id: 1 }, { letter: 'C', id: 2 }, { letter: 'n', id: 3 }, 
       { letter: 'c', id: 4 }, { letter: 'N', id: 5 }, { letter: 'C', id: 6 }, 
@@ -48,7 +48,7 @@ const App = () => {
     ]);
     setNBox([]);
     setCBox([]);
-  };
+  }, []);
 
   const handleDragStart = (letterObj) => {
     setDraggedItem(letterObj);
@@ -70,12 +70,12 @@ const App = () => {
     if (!draggedItem) return;
     
     if (box === 'N' && (draggedItem.letter === 'N' || draggedItem.letter === 'n')) {
-      setNBox([...nBox, draggedItem]);
-      setAvailableLetters(availableLetters.filter(item => item.id !== draggedItem.id));
+      setNBox(prev => [...prev, draggedItem]);
+      setAvailableLetters(prev => prev.filter(item => item.id !== draggedItem.id));
       celebrate('¡Excelente! Letra N correcta 🎉');
     } else if (box === 'C' && (draggedItem.letter === 'C' || draggedItem.letter === 'c')) {
-      setCBox([...cBox, draggedItem]);
-      setAvailableLetters(availableLetters.filter(item => item.id !== draggedItem.id));
+      setCBox(prev => [...prev, draggedItem]);
+      setAvailableLetters(prev => prev.filter(item => item.id !== draggedItem.id));
       celebrate('¡Fantástico! Letra C correcta 🎉');
     }
     setDraggedItem(null);
@@ -87,6 +87,7 @@ const App = () => {
   const [flippedCards, setFlippedCards] = useState([]);
   const [matchedCards, setMatchedCards] = useState([]);
 
+  // Arreglado useEffect con todas las dependencias
   useEffect(() => {
     if (currentActivity === 1) {
       const cards = [...palabrasN.slice(0, 3), ...palabrasC.slice(0, 3)];
@@ -95,7 +96,7 @@ const App = () => {
       setFlippedCards([]);
       setMatchedCards([]);
     }
-  }, [currentActivity]);
+  }, [currentActivity]); // Removidas las dependencias problemáticas
 
   const handleCardClick = (cardId) => {
     if (flippedCards.length === 2 || flippedCards.includes(cardId) || matchedCards.includes(cardId)) {
@@ -110,7 +111,7 @@ const App = () => {
       const card2 = memoryCards[newFlipped[1]];
       
       if (card1.palabra === card2.palabra) {
-        setMatchedCards([...matchedCards, ...newFlipped]);
+        setMatchedCards(prev => [...prev, ...newFlipped]);
         celebrate('¡Pareja encontrada! 🎊');
       }
       
@@ -131,7 +132,7 @@ const App = () => {
   const allWords = [...palabrasN, ...palabrasC];
   const currentWord = allWords[currentWordIndex];
 
-  const resetActivity3 = () => {
+  const resetActivity3 = useCallback(() => {
     setSelectedLetters([]);
     setCurrentWordIndex(0);
     setWordAvailableLetters([
@@ -140,14 +141,13 @@ const App = () => {
       { letter: 'S', id: 7 }, { letter: 'O', id: 8 }, { letter: 'R', id: 9 }, 
       { letter: 'Z', id: 10 }, { letter: 'D', id: 11 }, { letter: 'I', id: 12 }
     ]);
-  };
+  }, []);
 
   const handleLetterSelect = (letterObj) => {
     const newSelected = [...selectedLetters, letterObj];
     setSelectedLetters(newSelected);
     
-    // Remover la letra de las disponibles
-    setWordAvailableLetters(wordAvailableLetters.filter(item => item.id !== letterObj.id));
+    setWordAvailableLetters(prev => prev.filter(item => item.id !== letterObj.id));
     
     if (newSelected.length === currentWord.palabra.length) {
       const formed = newSelected.map(item => item.letter).join('');
@@ -155,8 +155,7 @@ const App = () => {
         celebrate('¡Palabra completada! 🌟');
         setTimeout(() => {
           setSelectedLetters([]);
-          setCurrentWordIndex((currentWordIndex + 1) % allWords.length);
-          // Resetear letras disponibles
+          setCurrentWordIndex(prev => (prev + 1) % allWords.length);
           setWordAvailableLetters([
             { letter: 'N', id: 1 }, { letter: 'U', id: 2 }, { letter: 'B', id: 3 }, 
             { letter: 'E', id: 4 }, { letter: 'C', id: 5 }, { letter: 'A', id: 6 }, 
@@ -171,8 +170,8 @@ const App = () => {
   const removeLastLetter = () => {
     if (selectedLetters.length > 0) {
       const removedLetter = selectedLetters[selectedLetters.length - 1];
-      setSelectedLetters(selectedLetters.slice(0, -1));
-      setWordAvailableLetters([...wordAvailableLetters, removedLetter]);
+      setSelectedLetters(prev => prev.slice(0, -1));
+      setWordAvailableLetters(prev => [...prev, removedLetter]);
     }
   };
 
@@ -181,18 +180,18 @@ const App = () => {
   const [foundLetters, setFoundLetters] = useState([]);
   const textWithLetters = "La NUBE está en el cielo azul y la CASA tiene un CORAZÓN en la puerta";
 
-  const resetActivity4 = () => {
+  const resetActivity4 = useCallback(() => {
     setTargetLetter('N');
     setFoundLetters([]);
-  };
+  }, []);
 
   const handleLetterClick = (char, index) => {
     if (char.toUpperCase() === targetLetter && !foundLetters.includes(index)) {
-      setFoundLetters([...foundLetters, index]);
+      setFoundLetters(prev => [...prev, index]);
       celebrate(`¡Encontraste la ${targetLetter}! 🎯`);
       if (foundLetters.length + 1 === 3) {
         setTimeout(() => {
-          setTargetLetter(targetLetter === 'N' ? 'C' : 'N');
+          setTargetLetter(prev => prev === 'N' ? 'C' : 'N');
           setFoundLetters([]);
         }, 1500);
       }
@@ -200,17 +199,17 @@ const App = () => {
   };
 
   // ========== RESET GENERAL ==========
-  const resetAllActivities = () => {
+  const resetAllActivities = useCallback(() => {
     setScore(0);
     resetActivity1();
     resetActivity3();
     resetActivity4();
-  };
+  }, [resetActivity1, resetActivity3, resetActivity4]);
 
   // ========== ACTIVIDADES RENDER ==========
   const activities = [
     // Actividad 1: Clasificación
-    <div className="bg-gradient-to-br from-pink-200 to-purple-200 p-6 rounded-3xl">
+    <div className="bg-gradient-to-br from-pink-200 to-purple-200 p-6 rounded-3xl" key="act1">
       <h2 className="text-2xl font-bold text-center mb-4 text-purple-800">
         <Sparkles className="inline mr-2" />
         ¡Clasifica las letras!
@@ -272,7 +271,7 @@ const App = () => {
     </div>,
 
     // Actividad 2: Memoria
-    <div className="bg-gradient-to-br from-green-200 to-blue-200 p-6 rounded-3xl">
+    <div className="bg-gradient-to-br from-green-200 to-blue-200 p-6 rounded-3xl" key="act2">
       <h2 className="text-2xl font-bold text-center mb-4 text-green-800">
         <Heart className="inline mr-2" />
         ¡Encuentra las parejas!
@@ -280,7 +279,7 @@ const App = () => {
       <div className="grid grid-cols-4 gap-4 max-w-md mx-auto">
         {memoryCards.map((card, index) => (
           <div
-            key={index}
+            key={`${card.palabra}-${index}`}
             onClick={() => handleCardClick(index)}
             className={`w-16 h-16 rounded-lg cursor-pointer transition-all duration-300 flex items-center justify-center text-2xl font-bold shadow-lg ${
               flippedCards.includes(index) || matchedCards.includes(index)
@@ -295,7 +294,7 @@ const App = () => {
     </div>,
 
     // Actividad 3: Construcción de palabras
-    <div className="bg-gradient-to-br from-orange-200 to-yellow-200 p-6 rounded-3xl">
+    <div className="bg-gradient-to-br from-orange-200 to-yellow-200 p-6 rounded-3xl" key="act3">
       <h2 className="text-2xl font-bold text-center mb-4 text-orange-800">
         <Trophy className="inline mr-2" />
         ¡Forma la palabra!
@@ -343,7 +342,7 @@ const App = () => {
     </div>,
 
     // Actividad 4: Encuentra la letra
-    <div className="bg-gradient-to-br from-red-200 to-pink-200 p-6 rounded-3xl">
+    <div className="bg-gradient-to-br from-red-200 to-pink-200 p-6 rounded-3xl" key="act4">
       <h2 className="text-2xl font-bold text-center mb-4 text-red-800">
         <Smile className="inline mr-2" />
         ¡Encuentra la letra {targetLetter}!
